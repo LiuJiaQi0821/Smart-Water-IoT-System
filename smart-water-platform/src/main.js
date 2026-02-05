@@ -11,13 +11,13 @@ import './assets/main.css'
 
 const app = createApp(App)
 
+app.use(createPinia())
+app.use(router)
+app.use(ElementPlus)
+
 // 注册所有图标
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
-
-app.use(createPinia())
-app.use(router)
-app.use(ElementPlus)
 
 app.mount('#app')
