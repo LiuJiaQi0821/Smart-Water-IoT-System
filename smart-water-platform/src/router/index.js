@@ -1,81 +1,80 @@
 import { createRouter, createWebHistory } from 'vue-router'
-// 引入布局组件
 import BasicLayout from '@/layout/BasicLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // 1. 登录页 (不需要 Layout)
+    // 1. 登录页
     {
       path: '/login',
       name: 'Login',
-      // 对应文件: src/views/login/LoginView.vue
       component: () => import('@/views/login/LoginView.vue')
     },
 
-    // 2. 主布局路由
+    // 2. 主应用布局 (需要登录)
     {
       path: '/',
       component: BasicLayout,
-      redirect: '/dashboard', // 默认跳到仪表盘
+      redirect: '/dashboard',
       children: [
         {
-          // 仪表盘
           path: 'dashboard',
           name: 'Dashboard',
-          meta: { title: '数据大屏' },
-          // 对应文件: src/views/dashboard/DataScreen.vue
+          meta: { title: '智能决策看板' },
           component: () => import('@/views/dashboard/DataScreen.vue')
         },
         {
-          // 智能决策
           path: 'decision',
           name: 'SmartDecision',
-          meta: { title: '智能决策' },
-          // 对应文件: src/views/decision/SmartDecision.vue
+          meta: { title: '智能决策中心', roles: ['admin'] }, // 标记: 仅管理员可进 (可选路由级控制)
           component: () => import('@/views/decision/SmartDecision.vue')
         },
         {
-          // 用水习惯分析
           path: 'analysis',
           name: 'WaterHabit',
           meta: { title: '用水习惯分析' },
-          // 对应文件: src/views/analysis/WaterHabit.vue
           component: () => import('@/views/analysis/WaterHabit.vue')
         },
         {
-          // 管网滴漏检测
           path: 'detection',
           name: 'LeakDetection',
           meta: { title: '管网滴漏检测' },
-          // 对应文件: src/views/detection/LeakDetection.vue
           component: () => import('@/views/detection/LeakDetection.vue')
         },
         {
-          // 系统分级管理
           path: 'system',
           name: 'SystemAdmin',
-          meta: { title: '系统分级管理' },
-          // 对应文件: src/views/system/SystemAdmin.vue
+          meta: { title: '系统分级管理', roles: ['admin'] }, // 标记: 仅管理员
           component: () => import('@/views/system/SystemAdmin.vue')
-        },
-        {
-          // (备用) 后台管理 - 对应你截图里的 admin 文件夹
-          path: 'admin-manage',
-          name: 'SystemManage',
-          meta: { title: '后台管理' },
-          // 对应文件: src/views/admin/SystemManage.vue
-          component: () => import('@/views/admin/SystemManage.vue')
         }
       ]
     },
 
-    // 3. 兜底路由 (404) - 可选，防止乱输网址报错
+    // 404
     {
       path: '/:pathMatch(.*)*',
-      redirect: '/dashboard'
+      redirect: '/login'
     }
   ]
+})
+
+// --- 全局权限守卫 ---
+router.beforeEach((to, from, next) => {
+  // 模拟从 localStorage 获取用户信息
+  const userRole = localStorage.getItem('userRole')
+
+  // 如果去的不是登录页，且没有角色信息，强制跳回登录页
+  if (to.path !== '/login' && !userRole) {
+    next('/login')
+  } else {
+    // 简单的权限判断 (如果路由配置了 meta.roles)
+    if (to.meta.roles && !to.meta.roles.includes(userRole)) {
+      alert('无权访问该页面')
+      next(from.path) // 或者是 '/dashboard'
+    } else {
+      next()
+    }
+  }
 })
 
 export default router
