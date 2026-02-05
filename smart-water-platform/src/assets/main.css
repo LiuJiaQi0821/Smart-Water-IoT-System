@@ -27,18 +27,21 @@
 }
 
 /* ==============================================
-   2. 暗黑模式支持 (自动适配系统设置)
+   2. 暗黑模式支持 (支持手动切换 .dark 类)
    ============================================== */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text-main: #e5eaf3;
-    --text-regular: #cfd3dc;
-    --text-secondary: #a3a6ad;
-    --bg-body: #141414;
-    --bg-card: #1d1e1f;
-    --border-color: #363637;
-    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  }
+html.dark:root {
+  --text-main: #e5eaf3;
+  --text-regular: #cfd3dc;
+  --text-secondary: #a3a6ad;
+  --bg-body: #141414;
+  --bg-card: #1d1e1f;
+  --border-color: #363637;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* 简单的背景色过渡，让切换不突兀 */
+body, .card, .el-header, .el-aside, .el-menu {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
 }
 
 /* ==============================================
@@ -152,4 +155,167 @@ a {
   &:hover {
     color: var(--primary-hover);
   }
+}
+
+/* ==============================================
+   6. 液态玻璃按钮样式 (Liquid Glass Buttons)
+   ============================================== */
+/* 基础按钮重置 */
+.el-button {
+  border: none !important; /* 去掉默认边框，用 box-shadow 模拟 */
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px;
+  border-radius: 12px !important; /* 更圆润的角，符合液态感 */
+}
+
+/* 点击下沉效果 */
+.el-button:active {
+  transform: scale(0.95);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* --------------------------
+   变体：默认按钮 (白/浅灰玻璃)
+   -------------------------- */
+.el-button:not(.is-text):not(.is-link):not(.el-button--primary):not(.el-button--success):not(.el-button--warning):not(.el-button--danger):not(.el-button--info) {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(236, 240, 243, 0.4)) !important;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.9), 
+    0 4px 10px rgba(0, 0, 0, 0.05);
+  color: #555 !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+}
+
+.el-button:not(.is-text):not(.is-link):not(.el-button--primary):not(.el-button--success):not(.el-button--warning):not(.el-button--danger):not(.el-button--info):hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(245, 247, 250, 0.6)) !important;
+  transform: translateY(-2px);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 1), 
+    0 8px 15px rgba(0, 0, 0, 0.08) !important;
+  color: var(--primary-color) !important;
+}
+
+/* --------------------------
+   变体：Primary (水蓝玻璃)
+   -------------------------- */
+.el-button--primary {
+  background: linear-gradient(135deg, rgba(64, 158, 255, 0.85), rgba(0, 122, 255, 0.65)) !important;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.4), 
+    0 4px 15px rgba(64, 158, 255, 0.35) !important;
+  color: #fff !important;
+}
+
+.el-button--primary:hover {
+  background: linear-gradient(135deg, rgba(64, 158, 255, 0.95), rgba(0, 110, 230, 0.8)) !important;
+  transform: translateY(-2px);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.5), 
+    0 8px 20px rgba(64, 158, 255, 0.5) !important;
+}
+
+/* --------------------------
+   变体：Success (森林绿玻璃)
+   -------------------------- */
+.el-button--success {
+  background: linear-gradient(135deg, rgba(103, 194, 58, 0.85), rgba(82, 165, 42, 0.65)) !important;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.4), 
+    0 4px 15px rgba(103, 194, 58, 0.35) !important;
+}
+
+.el-button--success:hover {
+  background: linear-gradient(135deg, rgba(103, 194, 58, 0.95), rgba(80, 160, 40, 0.8)) !important;
+  transform: translateY(-2px);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.5), 
+    0 8px 20px rgba(103, 194, 58, 0.5) !important;
+}
+
+/* --------------------------
+   变体：Warning (暖阳橙玻璃)
+   -------------------------- */
+.el-button--warning {
+  background: linear-gradient(135deg, rgba(230, 162, 60, 0.85), rgba(210, 140, 30, 0.65)) !important;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.4), 
+    0 4px 15px rgba(230, 162, 60, 0.35) !important;
+}
+
+.el-button--warning:hover {
+  background: linear-gradient(135deg, rgba(230, 162, 60, 0.95), rgba(210, 140, 30, 0.8)) !important;
+  transform: translateY(-2px);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.5), 
+    0 8px 20px rgba(230, 162, 60, 0.5) !important;
+}
+
+/* --------------------------
+   变体：Danger (警示红玻璃)
+   -------------------------- */
+.el-button--danger {
+  background: linear-gradient(135deg, rgba(245, 108, 108, 0.85), rgba(220, 60, 60, 0.65)) !important;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.4), 
+    0 4px 15px rgba(245, 108, 108, 0.35) !important;
+}
+
+.el-button--danger:hover {
+  background: linear-gradient(135deg, rgba(245, 108, 108, 0.95), rgba(220, 60, 60, 0.8)) !important;
+  transform: translateY(-2px);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.5), 
+    0 8px 20px rgba(245, 108, 108, 0.5) !important;
+}
+
+/* ==============================================
+   7. Element Plus 组件样式优化
+   ============================================== */
+/* 优化表格 Hover 效果，避免白色闪烁 */
+.el-table {
+  /* 使用半透明背景色，适应不同底色 */
+  --el-table-row-hover-bg-color: rgba(64, 158, 255, 0.08) !important;
+  /* 优化表头背景 */
+  --el-table-header-bg-color: rgba(255, 255, 255, 0.05) !important;
+  /* 确保表格背景透明，避免遮挡深色卡片背景 */
+  --el-table-bg-color: transparent !important;
+  --el-table-tr-bg-color: transparent !important;
+  --el-table-header-bg-color: transparent !important;
+  background-color: transparent !important;
+}
+
+/* 修复 Element Plus 默认的 focus 样式导致按钮颜色不恢复的问题 */
+.el-button:focus:not(:hover) {
+  /* 强制 focus 状态下（未 hover 时）使用默认背景，而不是 hover 背景 */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(236, 240, 243, 0.4)) !important;
+  border-color: transparent !important;
+  color: #555 !important;
+  transform: none !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+}
+
+.el-button--primary:focus:not(:hover) {
+  background: linear-gradient(135deg, rgba(64, 158, 255, 0.85), rgba(0, 122, 255, 0.65)) !important;
+  color: #fff !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 4px 15px rgba(64, 158, 255, 0.35) !important;
+}
+
+.el-button--success:focus:not(:hover) {
+  background: linear-gradient(135deg, rgba(103, 194, 58, 0.85), rgba(82, 165, 42, 0.65)) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 4px 15px rgba(103, 194, 58, 0.35) !important;
+}
+
+.el-button--warning:focus:not(:hover) {
+  background: linear-gradient(135deg, rgba(230, 162, 60, 0.85), rgba(210, 140, 30, 0.65)) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 4px 15px rgba(230, 162, 60, 0.35) !important;
+}
+
+.el-button--danger:focus:not(:hover) {
+  background: linear-gradient(135deg, rgba(245, 108, 108, 0.85), rgba(220, 60, 60, 0.65)) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 4px 15px rgba(245, 108, 108, 0.35) !important;
 }

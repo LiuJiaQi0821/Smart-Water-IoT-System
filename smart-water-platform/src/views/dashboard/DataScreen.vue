@@ -70,14 +70,27 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import * as echarts from 'echarts'
+import { useDark } from '@vueuse/core'
+
 // 如果 api/service.js 没有导出 getMonitorData，您可以暂时注释掉 import 并使用下面的模拟数据
 // import api from '@/api/service' 
 
 const chartRef = ref(null)
 const monitor = ref({})
 const colors = [{ color: '#67c23a', percentage: 40 }, { color: '#f56c6c', percentage: 80 }]
+const isDark = useDark()
+let myChart = null
+
+// 监听主题变化，更新图表
+watch(isDark, () => {
+  if (myChart) {
+    myChart.dispose()
+    if (isAdmin.value) initAdminChart()
+    else initUserChart(monitor.value)
+  }
+})
 
 // 获取当前角色
 const userRole = localStorage.getItem('userRole') || 'user'
@@ -108,8 +121,9 @@ onMounted(async () => {
 
 // 初始化用户图表 (个人视角)
 const initUserChart = (data) => {
-  const myChart = echarts.init(chartRef.value)
+  myChart = echarts.init(chartRef.value, isDark.value ? 'dark' : undefined)
   myChart.setOption({
+    backgroundColor: 'transparent',
     tooltip: { trigger: 'axis' },
     legend: { data: ['瞬时流速', '累计用水'] },
     xAxis: { type: 'category', data: data.times },
@@ -126,12 +140,21 @@ const initUserChart = (data) => {
 
 // 初始化管理员图表 (S级全域视角)
 const initAdminChart = () => {
-  const myChart = echarts.init(chartRef.value)
+  // 使用 'dark' 主题或默认主题
+  myChart = echarts.init(chartRef.value, isDark.value ? 'dark' : undefined)
+  // 手动把背景设为透明，否则 'dark' 主题自带黑色背景可能与卡片颜色不一致
+  const bgColor = 'transparent'
+  
   myChart.setOption({
+    backgroundColor: bgColor,
     color: ['#80FFA5', '#00DDFF', '#37A2FF', '#FF0087', '#FFBF00'],
     tooltip: { trigger: 'axis', axisPointer: { type: 'cross', label: { backgroundColor: '#6a7985' } } },
-    legend: { data: ['居民区总量', '商业区总量', '工业区总量', '市政绿化', '漏损预测'] },
-    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+    legend: { 
+      data: ['居民区总量', '商业区总量', '工业区总量', '市政绿化', '漏损预测'],
+      top: '0%', // 放在顶部
+      icon: 'circle'
+    },
+    grid: { left: '3%', right: '4%', bottom: '3%', top: '15%', containLabel: true },
     xAxis: [
       {
         type: 'category',
@@ -162,6 +185,28 @@ const initAdminChart = () => {
         areaStyle: { opacity: 0.8, color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgb(0, 221, 255)' }, { offset: 1, color: 'rgb(77, 119, 255)' }]) },
         emphasis: { focus: 'series' },
         data: [120, 282, 111, 234, 220, 340, 310]
+      },
+      {
+        name: '工业区总量',
+        type: 'line',
+        stack: 'Total',
+        smooth: true,
+        lineStyle: { width: 0 },
+        showSymbol: false,
+        areaStyle: { opacity: 0.8, color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgb(55, 162, 255)' }, { offset: 1, color: 'rgb(116, 21, 219)' }]) },
+        emphasis: { focus: 'series' },
+        data: [320, 132, 201, 334, 190, 130, 220]
+      },
+      {
+        name: '市政绿化',
+        type: 'line',
+        stack: 'Total',
+        smooth: true,
+        lineStyle: { width: 0 },
+        showSymbol: false,
+        areaStyle: { opacity: 0.8, color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgb(255, 191, 0)' }, { offset: 1, color: 'rgb(224, 62, 76)' }]) },
+        emphasis: { focus: 'series' },
+        data: [220, 402, 231, 134, 190, 230, 120]
       },
       {
         name: '漏损预测',
